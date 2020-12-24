@@ -4,22 +4,36 @@
 // When clicking search button, push city name to an array and set to local storage
 
 function searchWeather(searchValue) {
+    var searchValue = $(".searchBar").val();
+    queryUrl = `https://api.openweathermap.org/data/2.5/weather?q=${searchValue}&appid=976e997bd52dd1c4e4ea450f0adad5d6`;
     $.ajax({
-        url: `https://api.openweathermap.org/data/2.5/weather?q=${searchValue}&units=imperial&appid=976e997bd52dd1c4e4ea450f0adad5d6`,
+        url: queryUrl,
         method: "GET"
       }).then(function(response) { 
-        console.log(response); // Target elements on the page to display HTML with specific info from API
+        console.log(response);
+        // Target elements on the page to display HTML with specific info from API
         uvSearch(response.coord.lat, response.coord.lon);
+
+        var tempFar = (response.main.temp - 273.15) * 1.80 + 32;
+        $('.temp').text('Temperature(F): ' + tempFar.toFixed(2) + '\u00B0');
+        // Display humidity
+        $('.humidity').text('Humidity: ' + response.main.humidity + '%');
+        // Display wind speed
+        $('.wind').text('Wind Speed: ' + response.wind.speed + ' MPS');
       });
 }
+$("#searchBtn").on("click", searchWeather)
+
 function uvSearch(lat, lon) {
     $.ajax({
-        url: `https://api.openweathermap.org/data/2.5/uvi?lat=${lat}&lon=${lon}&appid=976e997bd52dd1c4e4ea450f0adad5d6`,
+        url: `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=hourly,daily&appid=976e997bd52dd1c4e4ea450f0adad5d6`,
         method: "GET"
       }).then(function(response) { 
         console.log(response); // Target elements on the page to display HTML with specific info from API
+        $('.uv-index').text('UV Index: ' + response.current.uvi);
       });
 }
+
 function fiveDayForecast(searchValue) {
     $.ajax({
         url: `https://api.openweathermap.org/data/2.5/forecast?q=${searchValue}&appid=976e997bd52dd1c4e4ea450f0adad5d6`,
