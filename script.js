@@ -11,9 +11,7 @@ function searchWeather(searchValue) {
         method: "GET"
       }).then(function(response) { 
         console.log(response);
-        // Target elements on the page to display HTML with specific info from API
         uvSearch(response.coord.lat, response.coord.lon);
-
         var tempFar = (response.main.temp - 273.15) * 1.80 + 32;
         $('.temp').text('Temperature(F): ' + tempFar.toFixed(2) + '\u00B0');
         // Display humidity
@@ -29,20 +27,32 @@ function uvSearch(lat, lon) {
         url: `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=hourly,daily&appid=976e997bd52dd1c4e4ea450f0adad5d6`,
         method: "GET"
       }).then(function(response) { 
-        console.log(response); // Target elements on the page to display HTML with specific info from API
+        console.log(response);
         $('.uv-index').text('UV Index: ' + response.current.uvi);
-      });
-}
+      
+      if (response.current.uvi <= 2) {
+      $('.uv-index').addClass("low")
+      } else if (uvIndex > 2 && uvIndex <= 7.99) {
+      $('.uv-index').addClass("moderate")
+      } else if (uvIndex >= 8) {
+      $('.uv-index').addClass("high")
+    }
+  });
+
+};
 
 function fiveDayForecast(searchValue) {
     $.ajax({
-        url: `https://api.openweathermap.org/data/2.5/forecast?q=${searchValue}&appid=976e997bd52dd1c4e4ea450f0adad5d6`,
+        url: `https://api.openweathermap.org/data/2.5/forecast?q=${searchValue}&appid=976e997bd52dd1c4e4ea450f0adad5d6&units=imperial`,
         method: "GET"
       }).then(function(response) { 
-        for (i = 0; i < response.list.length; i += 8) {
-            // Grab value and list to page
+        for (i = 0; i < 6; i ++) {
+          const unixTime = response.daily[i].dt;
+          const date = new Date(unixTime*1000);
+          console.log(date.toLocaleDateString("en-US"));
         }
         console.log(response); // Target elements on the page to display HTML with specific info from API
+        $
       });
 }
-fiveDayForecast("Portland");
+$("#searchBtn").on("click", fiveDayForecast)
